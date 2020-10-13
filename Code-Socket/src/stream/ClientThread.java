@@ -32,6 +32,7 @@ public class ClientThread
     		while (true) {
     		  String line = socIn.readLine();
     		  socOut.println(line);
+			  System.out.println("echo successful\nContent : "+line);
     		}
     	} catch (Exception e) {
         	System.err.println("Error in EchoServer:" + e); 

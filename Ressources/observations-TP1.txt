@@ -1,0 +1,5 @@
+Question 3.c
+On remarque que la première connection s'établit normalement, avec un message de confirmation côté serveur et client, et un echo qui fonctionne normalement.
+Cependant, pour la deuxième connection, la connection a l'air de s'établir pour le client (confirmation), mais pas pour le serveur : l'echo ne fonctionne pas du tout.
+Question 3.d
+Lorsque le serveur est multi-threaded, il peut supporter plusieurs connections de clients simultanées, le tout étant traansparent pour les clients.

@@ -2,7 +2,7 @@
  * EchoClient
  * Example of a TCP client 
  * Date: 10/01/04
- * Authors:
+ * Authors: Regaud Quentin and Meyer Yohan
  */
 package stream;
 
@@ -16,7 +16,7 @@ public class EchoClient {
  
   /**
   *  main method
-  *  accepts a connection, receives a message from client then sends an echo to the client
+  *  accepts a connection, receives a message from server then sends an echo to the server
   **/
     public static void main(String[] args) throws IOException {
 
@@ -45,7 +45,8 @@ public class EchoClient {
                                + "the connection to:"+ args[0]);
             System.exit(1);
         }
-                             
+        
+        System.out.println("Connection to the server successful");     
         String line;
         while (true) {
         	line=stdIn.readLine();

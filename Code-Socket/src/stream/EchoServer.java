@@ -2,7 +2,7 @@
  * EchoServer
  * Example of a TCP server
  * Date: 10/01/04
- * Authors:
+ * Authors: Regaud Quentin and Meyer Yohan
  */
 
 package stream;
@@ -25,6 +25,7 @@ public class EchoServer  {
     		while (true) {
     		  String line = socIn.readLine();
     		  socOut.println(line);
+			  System.out.println("echo successful\nContent : "+line);
     		}
     	} catch (Exception e) {
         	System.err.println("Error in EchoServer:" + e); 
