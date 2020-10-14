@@ -1,29 +1,30 @@
 /***
  * EchoClient
  * Example of a TCP client 
- * Date: 10/01/04
- * Authors: Regaud Quentin and Meyer Yohan
+ * Date: 13/10/2020
+ * Authors: B4412
  */
+ 
 package stream;
 
 import java.io.*;
 import java.net.*;
 
-
-
 public class EchoClient {
  
   /**
   *  main method
-  *  accepts a connection, receives a message from server then sends an echo to the server
+  *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteServer
   **/
-    public static void main(String[] args) throws IOException {
+  
+    public static void main (String[] args) throws IOException {
 
         Socket echoSocket = null;
         PrintStream socOut = null;
         BufferedReader stdIn = null;
-        BufferedReader socIn = null;
-        
+        BufferedReader socIn = null;        
+        String line = null;
+
 
         if (args.length != 2) {
           System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
@@ -33,10 +34,10 @@ public class EchoClient {
         try {
       	    // creation socket ==> connexion
       	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());
-	          socIn = new BufferedReader(
-	    		          new InputStreamReader(echoSocket.getInputStream()));    
-	          socOut= new PrintStream(echoSocket.getOutputStream());
-	          stdIn = new BufferedReader(new InputStreamReader(System.in));
+            socIn = new BufferedReader(
+                        new InputStreamReader(echoSocket.getInputStream()));    
+            socOut= new PrintStream(echoSocket.getOutputStream());
+            stdIn = new BufferedReader(new InputStreamReader(System.in));
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host:" + args[0]);
             System.exit(1);
@@ -48,21 +49,21 @@ public class EchoClient {
         
         System.out.println("Connection to the server successful");
         
-        //Création thread d'écoute du server 
-        ThreadEcouteServer tes = new ThreadEcouteServer(echoSocket);
-        tes.start();
+        //Creation thread d'ecoute du server 
+        ThreadEcouteServer serverListener = new ThreadEcouteServer(socIn);
+        serverListener.start();
 
-        //Ecoute le clavier pour envoyer message au serveur
-        String line;
+        //Ecoute le clavier pour envoyer le message au serveur
         while (true) {
         	line=stdIn.readLine();
         	if (line.equals(".")) break;
-        	socOut.println(line);//On envoie ce que l'on vient de taper
+        	socOut.println(line);
         }
-      socOut.close();
-      socIn.close();
-      stdIn.close();
-      echoSocket.close();
+        
+        socOut.close();
+        socIn.close();
+        stdIn.close();
+        echoSocket.close();
     }
 }
 
