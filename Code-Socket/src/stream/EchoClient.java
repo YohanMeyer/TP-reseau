@@ -24,12 +24,13 @@ public class EchoClient {
         BufferedReader stdIn = null;
         BufferedReader socIn = null;        
         String line = null;
-
+        String pseudo = null;
 
         if (args.length != 2) {
           System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
           System.exit(1);
         }
+        
 
         try {
       	    // creation socket ==> connexion
@@ -43,11 +44,17 @@ public class EchoClient {
             System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for "
-                               + "the connection to:"+ args[0]);
+                               + "the connection to:" + args[0]);
             System.exit(1);
         }
         
         System.out.println("Connection to the server successful");
+        
+        while (pseudo == null || pseudo.isEmpty() || pseudo.length() > 20) { 
+            System.out.println("Veuillez entrer votre pseudo (moins de 20 car.) :");
+            pseudo = stdIn.readLine();
+        }
+        socOut.println(pseudo);
         
         //Creation thread d'ecoute du server 
         ThreadEcouteServer serverListener = new ThreadEcouteServer(socIn);

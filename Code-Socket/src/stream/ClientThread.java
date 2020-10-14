@@ -9,25 +9,27 @@ package stream;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class ClientThread
 	extends Thread {
 	
 	private Socket clientSocket;
-	private static int nbUsers = 0;
-	private static boolean peutEnvoyer = true;
-	private static PrintStream [] usersOutput = new PrintStream[100];
+	private static boolean canSendMessage = true;
+	private static ArrayList<PrintStream> usersOutput = new ArrayList<PrintStream>();
 	private int numClient;
+	private String pseudoClient;
 	
 	public ClientThread (Socket socket) {
 		this.clientSocket = socket;
-		this.numClient = nbUsers;
-		try{
-			usersOutput[nbUsers] = new PrintStream(clientSocket.getOutputStream());
-			nbUsers++;
-			System.out.println("Affichage des "+nbUsers+" sockets enregistrees :");
-			for(int i = 0; i<nbUsers; i++){
-				System.out.println(i+"dans le tab : "+usersOutput[i]);
+		this.numClient = usersOutput.size();
+		this.pseudoClient = null;
+		
+		try {
+			usersOutput.add(new PrintStream(clientSocket.getOutputStream()));
+			System.out.println("Affichage des " + usersOutput.size() + " sockets enregistrees :");
+			for(PrintStream ps : usersOutput){
+				System.out.println(ps);
 			}
 		} catch(Exception e) {
 			System.err.println("Error in ClientThread:" + e); 
@@ -39,7 +41,7 @@ public class ClientThread
   	* @param socket the client socket
   	**/
 	
-	public void run() {
+	public void run () {
     	  try {
     		BufferedReader socIn = null;
     		socIn = new BufferedReader(
@@ -47,9 +49,10 @@ public class ClientThread
     		PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
     		while (true) {
 				String line = socIn.readLine();
-				if(!line.equals("null")){	//==>> pas très propre, plutot fermer la socket !!
-					//socOut.println("Message \""+line+"\" bien recu par le serveur");
-					System.out.println("User "+numClient+" a envoye un nouveau message : "+line);
+				if (pseudoClient == null) {
+					pseudoClient = line;
+				} else if (!line.equals("null")){	//==>> pas très propre, plutot fermer la socket !!
+					System.out.println(pseudoClient + " (num :" + numClient + ") a envoye un nouveau message : " + line);
 					sendNewMessage(line);
 				}
     		}
@@ -58,30 +61,19 @@ public class ClientThread
 		}
 	}
 	
-	private synchronized void sendNewMessage(String message)
+	private synchronized void sendNewMessage (String message)
 	{
-		while(!peutEnvoyer){
-			try { 
-				System.out.println("Appel à wait!");
-				wait();
-			} catch (InterruptedException e)  {
-				Thread.currentThread().interrupt(); 
-				System.err.println("Thread interrupted : "+ e);
-			}
-		}
+		while (!canSendMessage); // un autre utilisateur est en train d'envoyer un message
 
-		peutEnvoyer = false;
+		canSendMessage = false;
 		System.out.println("Envoi du message à tous les clients");
-		try {sleep(2000);}catch(Exception e){e.printStackTrace();}
-		for(int i = 0; i<nbUsers; i++){
+		int nbUsers = usersOutput.size();
+		for (int i = 0; i < nbUsers ; i++) {
 			if (i != numClient) {
-				usersOutput[i].println("User"+numClient+": "+message);
+				usersOutput.get(i).println(pseudoClient + " : " + message);
 			}
 		}
-		peutEnvoyer = true;
-		notify();
-	
-
+		canSendMessage = true;
 	}
 }
 
