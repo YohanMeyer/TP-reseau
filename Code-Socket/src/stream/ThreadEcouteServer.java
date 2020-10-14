@@ -26,6 +26,10 @@ public class ThreadEcouteServer
         try{
             while (true) {
                 String line = socIn.readLine();
+                if (line.equals(".")) {
+                    System.out.println("on ferme TES");
+                    return;
+                }
                 System.out.println(line);
             }
         } catch (Exception e) {

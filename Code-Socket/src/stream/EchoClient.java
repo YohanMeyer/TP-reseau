@@ -30,7 +30,6 @@ public class EchoClient {
           System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
           System.exit(1);
         }
-        
 
         try {
       	    // creation socket ==> connexion
@@ -62,9 +61,19 @@ public class EchoClient {
 
         //Ecoute le clavier pour envoyer le message au serveur
         while (true) {
-        	line=stdIn.readLine();
-        	if (line.equals(".")) break;
+        	line = stdIn.readLine();
+        	if (line.equals(".")) 
+            {
+                socOut.println(".");
+                break;
+            }
         	socOut.println(line);
+        }
+        // giving time to every thread to terminate before closing sockets
+        try {
+            Thread.sleep(50); 
+        } catch (Exception e) {
+            System.err.println("Error in EchoClient:" + e);
         }
         
         socOut.close();

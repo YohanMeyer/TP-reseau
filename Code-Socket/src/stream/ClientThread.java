@@ -51,7 +51,12 @@ public class ClientThread
 				String line = socIn.readLine();
 				if (pseudoClient == null) {
 					pseudoClient = line;
-				} else if (!line.equals("null")){	//==>> pas très propre, plutot fermer la socket !!
+					sendNewMessage("a rejoint le salon.");
+				} else if (line.equals(".")) {
+					sendNewMessage("a quitté le salon.");
+					usersOutput.get(numClient).println(".");
+					return;
+				} else {
 					System.out.println(pseudoClient + " (num :" + numClient + ") a envoye un nouveau message : " + line);
 					sendNewMessage(line);
 				}
