@@ -12,7 +12,6 @@ import java.net.*;
 
 
 public class EchoClient {
-
  
   /**
   *  main method
@@ -24,6 +23,7 @@ public class EchoClient {
         PrintStream socOut = null;
         BufferedReader stdIn = null;
         BufferedReader socIn = null;
+        
 
         if (args.length != 2) {
           System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
@@ -33,10 +33,10 @@ public class EchoClient {
         try {
       	    // creation socket ==> connexion
       	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());
-	    socIn = new BufferedReader(
+	          socIn = new BufferedReader(
 	    		          new InputStreamReader(echoSocket.getInputStream()));    
-	    socOut= new PrintStream(echoSocket.getOutputStream());
-	    stdIn = new BufferedReader(new InputStreamReader(System.in));
+	          socOut= new PrintStream(echoSocket.getOutputStream());
+	          stdIn = new BufferedReader(new InputStreamReader(System.in));
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host:" + args[0]);
             System.exit(1);
@@ -46,13 +46,18 @@ public class EchoClient {
             System.exit(1);
         }
         
-        System.out.println("Connection to the server successful");     
+        System.out.println("Connection to the server successful");
+        
+        //Création thread d'écoute du server 
+        ThreadEcouteServer tes = new ThreadEcouteServer(echoSocket);
+        tes.start();
+
+        //Ecoute le clavier pour envoyer message au serveur
         String line;
         while (true) {
         	line=stdIn.readLine();
         	if (line.equals(".")) break;
-        	socOut.println(line);
-        	System.out.println("echo: " + socIn.readLine());
+        	socOut.println(line);//On envoie ce que l'on vient de taper
         }
       socOut.close();
       socIn.close();
