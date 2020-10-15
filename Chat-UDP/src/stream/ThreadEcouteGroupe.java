@@ -1,6 +1,6 @@
 /***
  * ThreadEcouteGroupe
- * A UDP client thread for multicast listening
+
  * Date: 15/10/2020
  * Authors: B4412
  */
@@ -9,6 +9,7 @@ package stream;
 
 import java.io.*;
 import java.net.*;
+import java.util.ArrayList;
 
 public class ThreadEcouteGroupe
     extends Thread {
@@ -18,12 +19,17 @@ public class ThreadEcouteGroupe
     private final Integer taille = 1024; 
     private final byte buffer[] = new byte[taille];
     //private Integer numeroClient;
-    private boolean flag = false;
+    private boolean flagQuit = false;
+    private boolean flagHistory = false;
+    private static ArrayList<String> chatHistory = new ArrayList<String>();
 
     public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress) {//, Integer numeroClient) {
         this.multiSocket = multiSocket;
         //this.numeroClient = numeroClient;
         messageRecu = new DatagramPacket(buffer, buffer.length);
+        if (chatHistory.isEmpty()) {
+            flagHistory = true;
+        }
             
         try
         {
@@ -42,32 +48,32 @@ public class ThreadEcouteGroupe
   	**/
 	public void run() {
         try{
-            while (true && !flag) {
+            while (true && !flagQuit) {
                 multiSocket.receive(messageRecu);
                 
                 String line = new String(messageRecu.getData(), 0, messageRecu.getLength());
                 
-                /*Integer index = 0;
-                String numeroClientRecuString = new String();
-                while (Character.isDigit(line.charAt(index))) {
-                    numeroClientRecuString += line.charAt(index);
-                    index++;
+                if(line.charAt(0) == ' ') {
+                    line = line.substring(1);
                 }
-                Integer numeroClientRecu = new Integer(numeroClientRecuString).intValue();
-                
-                System.out.println(numeroClientRecu);
-                */
                 
                 System.out.println(line);
-
+                chatHistory.add(line);
                 messageRecu = new DatagramPacket(buffer, buffer.length);
             }
         } catch (Exception e) {
             System.err.println("Error in ThreadEcouteServer :" + e); 
         }
+        for(String s : chatHistory)
+        {
+          System.out.println(s);
+          
+        }
     }
     
-    public void setFlag(boolean quit) {
-        flag = quit;
+    public void setFlagQuit(boolean quit) {
+        flagQuit = quit;
     }
+    
+    //public void updateChatHistory
 }

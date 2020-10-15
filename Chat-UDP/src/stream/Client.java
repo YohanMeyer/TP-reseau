@@ -1,6 +1,6 @@
 /***
- * EchoClient
- * Example of a TCP client 
+ * Client
+
  * Date: 15/10/2020
  * Authors: B4412
  */
@@ -11,14 +11,15 @@ import java.io.*;
 import java.net.*;
 
 public class Client {
- 
+
+    private static int test = 0;
   /**
   *  main method
   *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteClient
   **/
   
     public static void main (String[] args) throws IOException {
-
+        
         MulticastSocket multiSocket = null;   
         InetAddress groupAddress = null;  
         Integer groupPort = null;
@@ -34,7 +35,7 @@ public class Client {
 
         try {
       	    // creation socket ==> connexion
-            groupAddress = InetAddress.getByName("228.5.6.7");
+            groupAddress = InetAddress.getByName(args[0]);
             groupPort = new Integer(args[1]).intValue();
             
       	    multiSocket = new MulticastSocket(groupPort);
@@ -48,26 +49,30 @@ public class Client {
         while (pseudo == null || pseudo.isEmpty() || pseudo.length() > 20) { 
             System.out.println("Veuillez entrer votre pseudo (moins de 20 car.) :");
             pseudo = stdIn.readLine();
-            /*if (pseudo.matches(".*\\d.*")) {
-                System.out.println("Votre pseudo ne peut pas contenir de chiffres.");
+            if (pseudo.charAt(0) == ' ') {
+                System.out.println("Votre pseudo ne peut pas commencer par un espace.");
                 pseudo = null;
-            }*/
+            }
         }
         
         //Creation thread d'ecoute du groupe 
         ThreadEcouteGroupe groupListener = new ThreadEcouteGroupe(multiSocket, groupAddress);//, numeroClient);
-        groupListener.start();
         
-        line = pseudo + " vient de rejoindre le chat.";
+        line = " " + pseudo + " vient de rejoindre le chat.";
         message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
         multiSocket.send(message);
+        try { // laisser le temps au premier client de recevoir le message
+            Thread.sleep(100); 
+        } catch (Exception e) {
+            System.err.println("Error in Client" + e);
+        }
+        groupListener.start();
 
         //Ecoute le clavier pour envoyer le message au serveur
         while (true) {
         	line = stdIn.readLine();
-        	if (line.equals(".")) 
-            {
-                groupListener.setFlag(true);
+        	if (line.equals(".")) {
+                groupListener.setFlagQuit(true);
                 line = pseudo + " vient de quitter le chat.";
                 message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
             	multiSocket.send(message);
