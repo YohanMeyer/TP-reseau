@@ -81,6 +81,8 @@ public class ClientThread
 				} else if (pseudoClient == null) {
 					pseudoClient = line;
 					sendNewMessage("a rejoint le salon.");
+				} else if(line.equals("$$delete$$")){
+					deleteChatHistory();
 				} else if (line.equals(".")) {
 					sendNewMessage("a quitté le salon.");
 					usersOutput.get(numClient).println(".");
@@ -97,14 +99,17 @@ public class ClientThread
 	
 	private synchronized void sendNewMessage (String message)
 	{
-		System.out.println("SNM");
+		//System.out.println("SNM, num"+numClient);
 		
-		while (!canSendMessage); // un autre utilisateur est en train d'envoyer un message
-		System.out.println("PASSED WHILE");
-		
+		System.out.println("num"+numClient+" peutEnvoyer ? "+canSendMessage);
+		while (!canSendMessage){ // un autre utilisateur est en train d'envoyer un message
+			System.out.print("");
+		}
 		canSendMessage = false;
+		System.out.println("num"+numClient+" PASSED WHILE");
+		
 		try{Thread.sleep(3000);} catch(Exception e){e.printStackTrace();}
-		System.out.println("Envoi du message à tous les clients");
+		System.out.println("num"+numClient+" : Envoi du message à tous les clients");
 		int nbUsers = usersOutput.size();
 		message = pseudoClient + " : " + message;
 		for (int i = 0; i < nbUsers ; i++) {
@@ -126,6 +131,21 @@ public class ClientThread
             e.printStackTrace();
         }
 		out.close();
+	}
+
+	private void deleteChatHistory(){
+		File file = new File("chat-history.txt");
+
+		try{
+			if(file.delete()){
+				System.out.println(file.getName() + " est supprimé.");
+			}else{
+				System.out.println("Opération de suppression echouée");
+			}
+		} catch(Exception e) {
+            System.err.println("An error occurred while deleting chat history.");
+            e.printStackTrace();
+        }
 	}
 }
 
