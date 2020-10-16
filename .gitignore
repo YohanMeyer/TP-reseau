@@ -1,6 +1,6 @@
 # Compiled class file
 *.class
-Chat-UDP/src/chat-history.txt
+Chat-TCP/src/chat-history.txt
 # Log file
 *.log
 
