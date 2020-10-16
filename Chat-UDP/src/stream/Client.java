@@ -27,6 +27,7 @@ public class Client {
         String line = null;
         String pseudo = null;
         BufferedReader stdIn = null;
+        final Integer taille = 1024;
 
         if (args.length != 2) {
           System.out.println("Usage: java Client <group host> <group port>");
@@ -35,7 +36,7 @@ public class Client {
 
         try {
       	    // creation socket ==> connexion
-            groupAddress = InetAddress.getByName(args[0]);
+            groupAddress = InetAddress.getByName(args[0]);//228.5.6.7
             groupPort = new Integer(args[1]).intValue();
             
       	    multiSocket = new MulticastSocket(groupPort);
@@ -56,7 +57,7 @@ public class Client {
         }
         
         //Creation thread d'ecoute du groupe 
-        ThreadEcouteGroupe groupListener = new ThreadEcouteGroupe(multiSocket, groupAddress);//, numeroClient);
+        ThreadEcouteGroupe groupListener = new ThreadEcouteGroupe(multiSocket, groupAddress, taille);//, numeroClient);
         
         line = " " + pseudo + " vient de rejoindre le chat.";
         message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
@@ -79,8 +80,15 @@ public class Client {
                 break;
             }
             line = pseudo + " : " + line;
-            message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
-        	multiSocket.send(message);
+            //System.out.println("Le message a une taille de : "+line.length());
+            if(line.length() <= taille){
+                message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
+                multiSocket.send(message);
+            }
+            else{
+                System.out.println("*****\nLe message ne peut pas etre envoye car il contient trop de caracteres ! ");
+                System.out.println("Veuillez envoyer votre message en plusieurs fois.\n***** ");
+            }
         }
         
         multiSocket.leaveGroup(groupAddress);

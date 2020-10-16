@@ -16,20 +16,17 @@ public class ThreadEcouteGroupe
     
     private MulticastSocket multiSocket;
     private DatagramPacket messageRecu = null;
-    private final Integer taille = 1024; 
-    private final byte buffer[] = new byte[taille];
+    //private final Integer taille = 1024;
+    private Integer taille;
+    private final byte buffer[];// = new byte[taille];
     //private Integer numeroClient;
     private boolean flagQuit = false;
-    private boolean flagHistory = false;
-    private static ArrayList<String> chatHistory = new ArrayList<String>();
 
-    public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress) {//, Integer numeroClient) {
+    public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress, Integer tailleMax) {//, Integer numeroClient) {
         this.multiSocket = multiSocket;
-        //this.numeroClient = numeroClient;
+        taille = tailleMax;
+        buffer = new byte[taille];
         messageRecu = new DatagramPacket(buffer, buffer.length);
-        if (chatHistory.isEmpty()) {
-            flagHistory = true;
-        }
             
         try
         {
@@ -58,22 +55,14 @@ public class ThreadEcouteGroupe
                 }
                 
                 System.out.println(line);
-                chatHistory.add(line);
                 messageRecu = new DatagramPacket(buffer, buffer.length);
             }
         } catch (Exception e) {
             System.err.println("Error in ThreadEcouteServer :" + e); 
-        }
-        for(String s : chatHistory)
-        {
-          System.out.println(s);
-          
         }
     }
     
     public void setFlagQuit(boolean quit) {
         flagQuit = quit;
     }
-    
-    //public void updateChatHistory
 }
