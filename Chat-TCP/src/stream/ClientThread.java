@@ -10,6 +10,9 @@ package stream;
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.charset.Charset;
 
 public class ClientThread
 	extends Thread {
@@ -19,6 +22,8 @@ public class ClientThread
 	private static ArrayList<PrintStream> usersOutput = new ArrayList<PrintStream>();
 	private int numClient;
 	private String pseudoClient;
+	private static ArrayList<String> chatHistory = new ArrayList<String>();
+	private PrintWriter out = null;
 	
 	public ClientThread (Socket socket) {
 		this.clientSocket = socket;
@@ -34,6 +39,28 @@ public class ClientThread
 		} catch(Exception e) {
 			System.err.println("Error in ClientThread:" + e); 
 		}
+		
+		try { // récupération et envoi de l'historique
+			out = new PrintWriter(new BufferedWriter(new FileWriter("chat-history.txt", true)));
+			System.out.println("out ok");
+			
+            chatHistory = new ArrayList<String>(Files.readAllLines(Paths.get("chat-history.txt"), Charset.defaultCharset()));
+			System.out.println("history reading ok");
+			
+            
+			for (String s : chatHistory) {
+                System.out.println(s);
+				usersOutput.get(numClient).println(s);
+			}
+			System.out.println("history printing ok");
+			
+			out.close();
+			System.out.println("closing ok");
+			
+        } catch (IOException e) {
+            System.err.println("An error occurred while reading chat history.");
+            e.printStackTrace();
+        }
 	}
 
  	/**
@@ -49,7 +76,9 @@ public class ClientThread
     		PrintStream socOut = new PrintStream(clientSocket.getOutputStream());
     		while (true) {
 				String line = socIn.readLine();
-				if (pseudoClient == null) {
+				if (line == null) {
+					socIn.close();
+				} else if (pseudoClient == null) {
 					pseudoClient = line;
 					sendNewMessage("a rejoint le salon.");
 				} else if (line.equals(".")) {
@@ -73,12 +102,25 @@ public class ClientThread
 		canSendMessage = false;
 		System.out.println("Envoi du message à tous les clients");
 		int nbUsers = usersOutput.size();
+		message = pseudoClient + " : " + message;
 		for (int i = 0; i < nbUsers ; i++) {
 			if (i != numClient) {
-				usersOutput.get(i).println(pseudoClient + " : " + message);
+				usersOutput.get(i).println(message);
 			}
 		}
+		updateChatHistory(message);
 		canSendMessage = true;
+	}
+	
+	private void updateChatHistory (String line) {
+		try {
+			out = new PrintWriter(new BufferedWriter(new FileWriter("chat-history.txt", true)));
+			out.println(line);
+		} catch (IOException e) {
+            System.err.println("An error occurred while updating chat history.");
+            e.printStackTrace();
+        }
+		out.close();
 	}
 }
 

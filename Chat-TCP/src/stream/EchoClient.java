@@ -52,7 +52,7 @@ public class EchoClient {
         while (pseudo == null || pseudo.isEmpty() || pseudo.length() > 20) { 
             System.out.println("Veuillez entrer votre pseudo (moins de 20 car.) :");
             pseudo = stdIn.readLine();
-        }
+        }        
         socOut.println(pseudo);
         
         //Creation thread d'ecoute du server 
@@ -65,20 +65,20 @@ public class EchoClient {
         	if (line.equals(".")) 
             {
                 socOut.println(".");
+                // giving time to every thread to terminate before closing sockets
+                try {
+                    Thread.sleep(100); 
+                } catch (Exception e) {
+                    System.err.println("Error in EchoClient:" + e);
+                }
                 break;
             }
         	socOut.println(line);
         }
-        // giving time to every thread to terminate before closing sockets
-        try {
-            Thread.sleep(50); 
-        } catch (Exception e) {
-            System.err.println("Error in EchoClient:" + e);
-        }
         
-        socOut.close();
-        socIn.close();
         stdIn.close();
+        socIn.close();
+        socOut.close();
         echoSocket.close();
     }
 }
