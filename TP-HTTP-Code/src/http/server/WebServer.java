@@ -7,6 +7,7 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
 /**
  * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
@@ -19,12 +20,13 @@ import java.net.Socket;
  * @version 1.0
  */
 public class WebServer {
-
+    private HashMap<String, String> resources;
     /**
     * WebServer constructor.
     */
     protected void start() {
         ServerSocket s;
+        //resources.add()
 
         System.out.println("Webserver starting up on port 80");
         System.out.println("(press ctrl-c to exit)");
@@ -51,25 +53,41 @@ public class WebServer {
                 // stop reading once a blank line is hit. This
                 // blank line signals the end of the client HTTP
                 // headers.
-                String str = ".";
-                while (str != null && !str.equals(""))
-                    str = in.readLine();
-
-                // Send the response
-                // Send the headers
-                out.println("HTTP/1.0 200 OK");
-                out.println("Content-Type: text/html");
-                out.println("Server: Bot");
-                // this blank line signals the end of the headers
-                out.println("");
-                // Send the HTML page
-                out.println("<H1>Welcome to the Ultra Mini-WebServer</H2>");
-                out.flush();
+                String response = ".";
+                while (response != null && !response.equals(""))
+                {
+                    System.out.println("je lis");
+                    
+                    response = in.readLine();
+                    System.out.println(response);
+                    
+                    /*if (response == null) {
+                        break;
+                    }*/
+                    String[] splitResponse = response.split(" ");
+                    if (splitResponse[0].equals("GET")) {
+                        System.out.println("HEY");
+                        respondToGET(out);
+                    }
+                }
                 remote.close();
             } catch (Exception e) {
                 System.out.println("Error: " + e);
             }
         }
+    }
+    
+    protected void respondToGET (PrintWriter out) {
+        // Send the response
+        // Send the headers
+        out.println("HTTP/1.0 200 OK");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        // this blank line signals the end of the headers
+        out.println("");
+        // Send the HTML page
+        out.println("<H1>welcome to the Ultra Mini-WebServer</H1>");
+        out.flush();
     }
 
     /**
