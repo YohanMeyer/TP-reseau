@@ -1,0 +1,21 @@
+yoyo : a rejoint le salon.
+quentin : a rejoint le salon.
+yoyo : ysalut
+yoyo : a quitté le salon.
+quentin : a rejoint le salon.
+yoyo : a rejoint le salon.
+yoyo : hey
+quentin : ouai
+quentin : ok
+quentin : a quitté le salon.
+yoyo : a rejoint le salon.
+quentin : a rejoint le salon.
+quentin : OK
+quentin : a quitté le salon.
+yoyo : a rejoint le salon.
+yoyo : ok
+yoyo : ze
+eric : a rejoint le salon.
+yo : a rejoint le salon.
+yo : az
+yo : a quitté le salon.

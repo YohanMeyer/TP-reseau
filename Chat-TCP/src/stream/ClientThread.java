@@ -97,9 +97,13 @@ public class ClientThread
 	
 	private synchronized void sendNewMessage (String message)
 	{
+		System.out.println("SNM");
+		
 		while (!canSendMessage); // un autre utilisateur est en train d'envoyer un message
-
+		System.out.println("PASSED WHILE");
+		
 		canSendMessage = false;
+		try{Thread.sleep(3000);} catch(Exception e){e.printStackTrace();}
 		System.out.println("Envoi du message à tous les clients");
 		int nbUsers = usersOutput.size();
 		message = pseudoClient + " : " + message;
@@ -108,6 +112,7 @@ public class ClientThread
 				usersOutput.get(i).println(message);
 			}
 		}
+		
 		updateChatHistory(message);
 		canSendMessage = true;
 	}
