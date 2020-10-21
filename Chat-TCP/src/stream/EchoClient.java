@@ -9,6 +9,9 @@ package stream;
 
 import java.io.*;
 import java.net.*;
+import javax.swing.*;
+import java.awt.*;
+
 
 public class EchoClient {
  
@@ -17,70 +20,107 @@ public class EchoClient {
   *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteServer
   **/
   
-    public static void main (String[] args) throws IOException {
+    private JFrame fenetreParams;
+    private JTextField jtfAddresse;
+    private JTextField jtfPort;
+    private JTextField jtfPseudo;
+    
+    public EchoClient () {
+        
+        Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
+        double jFrameWidth = screenDimension.width/1440.0;
+        double jFrameHeight = screenDimension.height/800.0; // permettent d'adapter la taille de tous les composants à l'écran
+        
+        fenetreParams = new JFrame();
+        JPanel container = new JPanel();
+        JPanel top = new JPanel();
+        JPanel mid = new JPanel();
+        JPanel bot = new JPanel();
+        
+        fenetreParams.setTitle("Paramètres");
+        fenetreParams.setSize((int)(jFrameWidth*400), (int)(jFrameHeight*300));
+        fenetreParams.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        fenetreParams.setLocationRelativeTo(null);
+        fenetreParams.setResizable(false);
 
+        container.setLayout(new BorderLayout((int)jFrameWidth*15, (int)jFrameWidth*10));
+        fenetreParams.setContentPane(container);
+        
+        
+        JLabel labelAdresse = new JLabel("Addresse IP du serveur : ");
+        JLabel labelPort = new JLabel("Port de communication : ");
+        JLabel labelPseudo = new JLabel("Votre pseudo : ");
+        
+        jtfAddresse = new JTextField();
+        jtfAddresse.setPreferredSize(new Dimension((int)jFrameWidth*100, (int)jFrameHeight*26));
+        jtfPort = new JTextField();
+        jtfPort.setPreferredSize(new Dimension((int)jFrameWidth*50, (int)jFrameHeight*26));
+        jtfPseudo = new JTextField();
+        jtfPseudo.setPreferredSize(new Dimension((int)jFrameWidth*200, (int)jFrameHeight*26));
+
+        JButton boutonOK = new JButton("OK");
+        boutonOK.addActionListener(new BoutonListener(this));
+
+        top.add(labelAdresse);
+        top.add(jtfAddresse);
+        top.add(labelPort);
+        top.add(jtfPort);
+        
+        mid.add(labelPseudo);
+        mid.add(jtfPseudo);
+        
+        bot.add(boutonOK);
+        
+        container.add(top, BorderLayout.NORTH);
+        container.add(mid, BorderLayout.CENTER);
+        container.add(bot, BorderLayout.SOUTH);
+        
+        fenetreParams.pack();
+
+        fenetreParams.setVisible(true);
+        
+    }
+    
+    public void recupererDonnees() {
+        String addresse = jtfAddresse.getText();
+        String port = jtfPort.getText();
+        String pseudo = jtfPseudo.getText();
+        this.init(addresse, Integer.parseInt(port), pseudo);
+        fenetreParams.dispose();
+    }
+    
+    public void init(String addresse, Integer port, String pseudo) {
         Socket echoSocket = null;
-        PrintStream socOut = null;
-        BufferedReader stdIn = null;
-        BufferedReader socIn = null;        
-        String line = null;
-        String pseudo = null;
-
-        if (args.length != 2) {
-          System.out.println("Usage: java EchoClient <EchoServer host> <EchoServer port>");
-          System.exit(1);
-        }
-
+        BufferedReader socIn = null;
+        
         try {
       	    // creation socket ==> connexion
-      	    echoSocket = new Socket(args[0],new Integer(args[1]).intValue());
-            socIn = new BufferedReader(
-                        new InputStreamReader(echoSocket.getInputStream()));    
-            socOut= new PrintStream(echoSocket.getOutputStream());
-            stdIn = new BufferedReader(new InputStreamReader(System.in));
+      	    echoSocket = new Socket(addresse, port);
+            socIn = new BufferedReader(new InputStreamReader(echoSocket.getInputStream()));  
         } catch (UnknownHostException e) {
-            System.err.println("Don't know about host:" + args[0]);
+            System.err.println("Don't know about host:" + addresse);
             System.exit(1);
         } catch (IOException e) {
             System.err.println("Couldn't get I/O for "
-                               + "the connection to:" + args[0]);
+                               + "the connection to:" + addresse);
             System.exit(1);
         }
         
         System.out.println("Connection to the server successful");
         
-        while (pseudo == null || pseudo.isEmpty() || pseudo.length() > 20) { 
-            System.out.println("Veuillez entrer votre pseudo (moins de 20 car.) :");
-            pseudo = stdIn.readLine();
-        }        
-        socOut.println(pseudo);
+        ClientIHM fenetre = new ClientIHM(echoSocket, pseudo);
         
         //Creation thread d'ecoute du server 
-        ThreadEcouteServer serverListener = new ThreadEcouteServer(socIn);
-        serverListener.start();
+        ThreadEcouteServer serverListener = new ThreadEcouteServer(socIn, fenetre);
+        serverListener.start();     
+    }
 
-        //Ecoute le clavier pour envoyer le message au serveur
-        while (true) {
-        	line = stdIn.readLine();
-        	if (line.equals(".")) 
-            {
-                socOut.println(".");
-                // giving time to every thread to terminate before closing sockets
-                try {
-                    Thread.sleep(100); 
-                } catch (Exception e) {
-                    System.err.println("Error in EchoClient:" + e);
-                }
-                break;
-            }
-        	socOut.println(line);
-        }
-        
-        stdIn.close();
-        socIn.close();
-        socOut.close();
-        echoSocket.close();
+    public static void main (String[] args) {
+        EchoClient client = new EchoClient();
     }
 }
+
+
+
 
 
