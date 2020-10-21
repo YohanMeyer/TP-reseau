@@ -42,21 +42,14 @@ public class ClientThread
 		
 		try { // récupération et envoi de l'historique
 			out = new PrintWriter(new BufferedWriter(new FileWriter("chat-history.txt", true)));
-			System.out.println("out ok");
 			
             chatHistory = new ArrayList<String>(Files.readAllLines(Paths.get("chat-history.txt"), Charset.defaultCharset()));
-			System.out.println("history reading ok");
-			
             
 			for (String s : chatHistory) {
-                System.out.println(s);
 				usersOutput.get(numClient).println(s);
 			}
-			System.out.println("history printing ok");
 			
 			out.close();
-			System.out.println("closing ok");
-			
         } catch (IOException e) {
             System.err.println("An error occurred while reading chat history.");
             e.printStackTrace();
@@ -80,7 +73,7 @@ public class ClientThread
 					socIn.close();
 				} else if (pseudoClient == null) {
 					pseudoClient = line;
-					sendNewMessage("a rejoint le salon.");
+					sendNewMessage("a rejoint le salon.");					
 				} else if(line.equals("$$delete$$")){
 					deleteChatHistory();
 				} else if (line.equals(".")) {
@@ -97,25 +90,17 @@ public class ClientThread
 		}
 	}
 	
-	private synchronized void sendNewMessage (String message)
-	{
-		//System.out.println("SNM, num"+numClient);
-		
-		System.out.println("num"+numClient+" peutEnvoyer ? "+canSendMessage);
+	private synchronized void sendNewMessage (String message) {		
 		while (!canSendMessage){ // un autre utilisateur est en train d'envoyer un message
 			System.out.print("");
 		}
 		canSendMessage = false;
-		System.out.println("num"+numClient+" PASSED WHILE");
 		
-		try{Thread.sleep(3000);} catch(Exception e){e.printStackTrace();}
 		System.out.println("num"+numClient+" : Envoi du message à tous les clients");
 		int nbUsers = usersOutput.size();
 		message = pseudoClient + " : " + message;
 		for (int i = 0; i < nbUsers ; i++) {
-			if (i != numClient) {
-				usersOutput.get(i).println(message);
-			}
+			usersOutput.get(i).println(message);
 		}
 		
 		updateChatHistory(message);
@@ -133,16 +118,16 @@ public class ClientThread
 		out.close();
 	}
 
-	private void deleteChatHistory(){
+	private void deleteChatHistory () {
 		File file = new File("chat-history.txt");
 
-		try{
-			if(file.delete()){
+		try {
+			if (file.delete()) {
 				System.out.println(file.getName() + " est supprimé.");
-			}else{
+			} else {
 				System.out.println("Opération de suppression echouée");
 			}
-		} catch(Exception e) {
+		} catch (Exception e) {
             System.err.println("An error occurred while deleting chat history.");
             e.printStackTrace();
         }

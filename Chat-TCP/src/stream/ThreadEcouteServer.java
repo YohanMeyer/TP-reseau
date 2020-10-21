@@ -13,9 +13,11 @@ public class ThreadEcouteServer
     extends Thread {
     
     private BufferedReader socIn;
+    private ClientIHM fenetre;
 
-    public ThreadEcouteServer (BufferedReader in) {
+    public ThreadEcouteServer (BufferedReader in, ClientIHM fenetre) {
         this.socIn = in;
+        this.fenetre = fenetre;
     }
 
     /**
@@ -27,13 +29,12 @@ public class ThreadEcouteServer
             while (true) {
                 String line = socIn.readLine();
                 if (line.equals(".")) {
-                    System.out.println("on ferme TES");
                     return;
                 }
-                System.out.println(line);
+                fenetre.messageRecu(line);
             }
         } catch (Exception e) {
-            System.err.println("Error in ThreadEcouteServer :" + e); 
-        }
+            System.out.println("Closing socket"); 
+        }        
     }
 }
