@@ -41,7 +41,7 @@ public class WebServer {
         System.out.println("(press ctrl-c to exit)");
         try {
             // create the main server socket
-            s = new ServerSocket(3000);
+            s = new ServerSocket(80);
         } catch (Exception e) {
             System.out.println("Error: " + e);
             return;
@@ -57,15 +57,13 @@ public class WebServer {
                 BufferedReader in = new BufferedReader(new InputStreamReader(
                     remote.getInputStream()));
                 PrintWriter out = new PrintWriter(remote.getOutputStream());
-                PrintWriter sortieFichier=null;
 
                 // read the data sent. We basically ignore it,
                 // stop reading once a blank line is hit. This
                 // blank line signals the end of the client HTTP
                 // headers.
-                ArrayList<String> request = new ArrayList<String>();
                 ArrayList<String> readFile = null;
-                String firstLine = ".";
+                String request = ".";
                 String fileName = "";
                 boolean first = true;
                 boolean fichierExistant = true;
@@ -73,36 +71,31 @@ public class WebServer {
                 Integer contentLength = 0;
                 char[] messageBody=null;
                 
-                while (firstLine != null)
+                while (request != null) // reading a request
                 {            
-                    firstLine = in.readLine();
-                    System.out.println(first + "LIGNE : " + firstLine);
+                    request = in.readLine();
+                    System.out.println(first + "LIGNE : " + request);
                     System.out.println("");
                     
-                    /*if (response == null) {
-                        break;
-                    }*/
-                    List<String> splitLine = Arrays.asList(firstLine.split(" "));
-                    /*for (String st : splitLine) {
-                        System.out.print(s);
-                    }*/
+                    List<String> splitLine = Arrays.asList(request.split(" "));
                     
-                    if ((method.equals("GET") || method.equals("HEAD")) && firstLine.equals("")) {
+                    if ((method.equals("GET") || method.equals("HEAD")) && request.equals("")) {
                         break;
-                    } else if (method.equals("POST") || method.equals("PUT") && splitLine.get(0).equals("Content-Length:")) {
+                    } else if ((method.equals("POST") || method.equals("PUT")) && splitLine.get(0).equals("Content-Length:")) {
                         contentLength = Integer.parseInt(splitLine.get(1));
-                    } else if( (method.equals("POST") || method.equals("PUT")) && firstLine.equals("")) {
+
+                    } else if( (method.equals("POST") || method.equals("PUT")) && request.equals("")) {
                         System.out.println("on rentre dans le body, content length="+contentLength);
                         
                         char[] body = new char[contentLength];
                         in.read(body, 0, contentLength);
-                        firstLine = new String(body);   
-                        System.out.println(firstLine);
+                        request = new String(body);   
+                        System.out.println(request);
                         
                         if(method.equals("PUT")){//La structure de base ne fonctionne pas car dans le cas de put 
                                                  //il faut avoir fini de lire le fichier avant d'appeler respondToPut
                             System.out.println("Filename = "+fileName);
-                            respondToPut(out, sortieFichier, firstLine, fichierExistant, fileName);
+                            respondToPut(out, request, fichierExistant, fileName);
                         }
                              
                         break;
@@ -117,16 +110,15 @@ public class WebServer {
                             fileName += "accueil.html";
                         }
                         
-                        try
-                        {
+                        try {
                             readFile = new ArrayList<String>(Files.readAllLines(Paths.get("./http/server"+fileName), Charset.defaultCharset()));
                             System.out.println("file reading ok");   
-                        }
-                        catch(IOException e)
-                        {
+                        } catch(IOException e) {
                             first = false;
-                            respondError(out);
                             fichierExistant = false;
+                            if (!method.equals("PUT")) {
+                                respondError(out);
+                            }
                             continue;
                         }
                         
@@ -145,27 +137,29 @@ public class WebServer {
 
                             case "HEAD":
                                 System.out.println("HEAD");
-                                respondToHead(out);  
+                                respondToHead(out);
+                                
                                 break;
 
                             case "PUT":
                                 System.out.println("PUT");
                                 //respondToPut(out, sortieFichier, readFile, fichierExistant, fileName);
+                                
                                 break;
 
                             case "DELETE":
                                 System.out.println("DELETE");
                                 respondToDelete(out, fileName);
+                                
                                 break;
                             case "OPTIONS":
                                 System.out.println("OPTIONS");
                                 respondToOptions(out);  
+                                
                                 break;
                         }
-                    } else if (first) {
-                        System.out.println("Oh no");
-                        respondError(out);
                     }
+                    
                     first = false;
                 }
                 remote.close();
@@ -245,62 +239,58 @@ public class WebServer {
 
     }
 
-    protected void respondToPut(PrintWriter out, PrintWriter sortieFichier,
-                                String fileContent, boolean fichierExistant, String fileName){
+    protected void respondToPut (PrintWriter out, String fileContent, boolean fichierExistant, String fileName) {
         boolean erreur = false;
-        File file=null;
+        File file = null;
 
         //Suppression si fichier existant
-        if(fichierExistant){
+        if (fichierExistant) {
             System.out.println("On tente de supprimer le ficher qui existe déjà");
             file = new File("http/server/"+fileName);
-            try{
-                if(file.delete()){
+            try {
+                if (file.delete()) {
                     System.out.println(file.getName() + " est supprimé.");
-                }else{
+                } else {
                     System.out.println("Opération de suppression echouée");
                 }
             } catch(Exception e) {
                 System.err.println("An error occurred while deleting the file.");
                 e.printStackTrace();
-                erreur = true;
+                respondError(out);
+                return;
             }
         }
 
         //Ecriture du nouveau fichier
-        try{
-            sortieFichier = new PrintWriter(new BufferedWriter(new FileWriter("http/server/"+fileName, true)));
+        try {
+            PrintWriter sortieFichier = new PrintWriter(new BufferedWriter(new FileWriter("http/server/"+fileName, true)));
             sortieFichier.println(fileContent);
             System.out.println("Ecriture dans le nouveau fichier...");
+            sortieFichier.close();
         } catch (Exception e) {
             System.err.println("An error occurred while writing the new file in PUT.");
             e.printStackTrace();
-            erreur = true;
+            respondError(out);
+            return;
         }
-        sortieFichier.close();
 
         //Ecriture sur la sortie response Client
-        System.out.println("erruer?:"+erreur);
-        if(!erreur){
-            System.out.println("Envoi d'une reponse...");
-            if(fichierExistant){
-                out.println("HTTP/1.0 204 No Content");//Indique que la modification a bien été faite
-                out.println("Content-Location: "+fileName);
-                out.println("Server: Bot");
-            // this blank line signals the end of the headers
-            out.println("");
+        
+        System.out.println("Envoi d'une reponse...");
+        if (fichierExistant) { // indiquer que la modification a bien été faite
+            out.println("HTTP/1.0 204 No Content"); 
+            out.println("Content-Location: "+fileName);
+            out.println("Server: Bot");
+            out.println(""); // this blank line signals the end of the headers
             out.flush();
-            } else {
-                out.println("HTTP/1.0 201 Created");
-                out.println("Content-Location: "+fileName);
-                out.println("Server: Bot");
-                // this blank line signals the end of the headers
-                out.println("");
-                out.flush();
-            } 
-        } else{
-            respondError(out);
-        }  
+        } else { //indiquer que le fichier a bien été créé
+            out.println("HTTP/1.0 201 Created");
+            out.println("Content-Location: "+fileName);
+            out.println("Server: Bot");
+            
+            out.println(""); // this blank line signals the end of the headers
+            out.flush();
+        } 
     }
     
     protected void respondToOptions (PrintWriter out) {
@@ -316,10 +306,7 @@ public class WebServer {
         out.println("Content-Length: 0");
         out.println("Content-Type: text/html");
 
-
-        // this blank line signals the end of the headers
-        out.println("");
-        // Send the HTML page
+        out.println(""); // this blank line signals the end of the headers
         out.flush();
     }
     
@@ -329,13 +316,11 @@ public class WebServer {
         out.println("HTTP/1.0 400 BAD");
         out.println("Content-Type: text/html");
         out.println("Server: Bot");
-        // this blank line signals the end of the headers
-        out.println("");
-        // Send the HTML page
+        
+        out.println(""); // this blank line signals the end of the headers
         out.println("BAD ERROR 400");
         out.flush();
     }
-    
 
     /**
     * Start the application.
