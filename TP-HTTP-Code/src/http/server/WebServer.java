@@ -41,7 +41,7 @@ public class WebServer {
         System.out.println("(press ctrl-c to exit)");
         try {
             // create the main server socket
-            s = new ServerSocket(80);
+            s = new ServerSocket(3000);
         } catch (Exception e) {
             System.out.println("Error: " + e);
             return;
@@ -117,7 +117,7 @@ public class WebServer {
                             first = false;
                             fichierExistant = false;
                             if (!method.equals("PUT")) {
-                                respondError(out);
+                                respond404(out);
                             }
                             continue;
                         }
@@ -228,12 +228,12 @@ public class WebServer {
                 out.flush();
             }else{
                 System.out.println("Opération de suppression echouée");
-                respondError(out);
+                respond500(out);
             }
         } catch(Exception e) {
             System.err.println("An error occurred while deleting the file.");
             e.printStackTrace();
-            respondError(out);
+            respond500(out);
         }
         
 
@@ -256,7 +256,7 @@ public class WebServer {
             } catch(Exception e) {
                 System.err.println("An error occurred while deleting the file.");
                 e.printStackTrace();
-                respondError(out);
+                respond500(out);
                 return;
             }
         }
@@ -270,7 +270,7 @@ public class WebServer {
         } catch (Exception e) {
             System.err.println("An error occurred while writing the new file in PUT.");
             e.printStackTrace();
-            respondError(out);
+            respond500(out);
             return;
         }
 
@@ -310,7 +310,7 @@ public class WebServer {
         out.flush();
     }
     
-    protected void respondError (PrintWriter out) {
+    protected void respond400 (PrintWriter out) {
         // Send the response
         // Send the headers
         out.println("HTTP/1.0 400 BAD");
@@ -319,6 +319,42 @@ public class WebServer {
         
         out.println(""); // this blank line signals the end of the headers
         out.println("BAD ERROR 400");
+        out.flush();
+    }
+
+    protected void respond404(PrintWriter out){
+        // Send the response
+        // Send the headers
+        out.println("HTTP/1.0 404 Not found");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        out.println(""); // this blank line signals the end of the headers
+        out.println(" Not found - ERROR 404");
+        out.flush();
+    }
+
+    protected void respond418(PrintWriter out){
+        // Send the response
+        // Send the headers
+        out.println("HTTP/1.0 418 I'm a teapot");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        out.println(""); // this blank line signals the end of the headers
+        out.println(" I'm a teapot' - ERROR 418");
+        out.flush();
+    }
+
+    protected void respond500(PrintWriter out){
+        // Send the response
+        // Send the headers
+        out.println("HTTP/1.0 500 Internal Server Error");
+        out.println("Content-Type: text/html");
+        out.println("Server: Bot");
+        
+        out.println(""); // this blank line signals the end of the headers
+        out.println(" Internal Server Error - ERROR 500");
         out.flush();
     }
 
