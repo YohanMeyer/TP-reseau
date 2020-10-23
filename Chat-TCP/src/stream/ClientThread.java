@@ -58,7 +58,6 @@ public class ClientThread
 
  	/**
   	* receives a message from client and sends an echo to the client
-  	* @param socket the client socket
   	**/
 	
 	public void run () {

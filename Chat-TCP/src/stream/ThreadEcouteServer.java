@@ -22,7 +22,6 @@ public class ThreadEcouteServer
 
     /**
   	* receives a message from server and displays it on client's console
-  	* @param BufferedReader the input data stream 
   	**/
 	public void run() {
         try{
