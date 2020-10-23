@@ -17,17 +17,6 @@ import java.io.IOException;
 import java.nio.file.Paths;
 import java.io.*;
 
-
-/**
- * Example program from Chapter 1 Programming Spiders, Bots and Aggregators in
- * Java Copyright 2001 by Jeff Heaton
- * 
- * WebServer is a very simple web-server. Any request is responded with a very
- * simple web-page.
- * 
- * @author Jeff Heaton
- * @version 1.0
- */
 public class WebServer {
     /**
     * WebServer constructor.
@@ -41,7 +30,7 @@ public class WebServer {
             // create the main server socket
             s = new ServerSocket(80);
         } catch (Exception e) {
-            System.out.println("Error: " + e);
+            System.err.println("Error: " + e);
             return;
         }
 
@@ -74,8 +63,6 @@ public class WebServer {
                 while (request != null) // reading a request
                 {            
                     request = in.readLine();
-                    System.out.println("LIGNE : " + request);
-                    System.out.println("");
                     
                     List<String> splitLine = Arrays.asList(request.split(" "));
                     
@@ -88,16 +75,13 @@ public class WebServer {
                         contentLength = Integer.parseInt(splitLine.get(1));
 
                     } else if( (method.equals("POST") || method.equals("PUT")) && request.equals("")) {
-                        System.out.println("on rentre dans le body, content length="+contentLength);
                         
                         char[] body = new char[contentLength];
                         in.read(body, 0, contentLength);
                         request = new String(body);
                            
                         
-                        if (method.equals("PUT")) { //La structure de base ne fonctionne pas car dans le cas de put 
-                                                    //il faut avoir fini de lire le fichier avant d'appeler respondToPut
-                            System.out.println("Filename = "+fileName);
+                        if (method.equals("PUT")) { 
                             respondToPut(out, request, fichierExistant, fileName);
                         } else if(method.equals("POST")) {
                             System.out.println(request);
@@ -107,7 +91,6 @@ public class WebServer {
                     }
                     
                     if (first) {
-                        System.out.println("Test des méthodes...");
                         
                         fileName = splitLine.get(1);
                         method = splitLine.get(0);
@@ -138,7 +121,6 @@ public class WebServer {
                             } else if(fileName.contains(".mkv")) {
                                 fileType = "video/webm";
                             }
-                            System.out.println("file reading ok"+readFile.length);
                         } catch(IOException e) {
                             first = false;
                             fichierExistant = false;
@@ -169,7 +151,6 @@ public class WebServer {
 
                             case "PUT":
                                 System.out.println("PUT");
-                                //respondToPut(out, sortieFichier, readFile, fichierExistant, fileName);
                                 
                                 break;
 
@@ -259,7 +240,7 @@ public class WebServer {
                 out.write(header);
                 out.flush();
             } else {
-                System.out.println("Opération de suppression echouée");
+                System.err.println("Opération de suppression echouée");
                 respond500(out);
             }
         } catch(Exception e) {
@@ -280,7 +261,7 @@ public class WebServer {
                 if (file.delete()) {
                     System.out.println(file.getName() + " est supprimé.");
                 } else {
-                    System.out.println("Opération de suppression echouée");
+                    System.err.println("Opération de suppression echouée");
                 }
             } catch(Exception e) {
                 System.err.println("An error occurred while deleting the file.");
