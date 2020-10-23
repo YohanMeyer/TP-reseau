@@ -1,27 +1,45 @@
-/***
- * ThreadEcouteGroupe
-
- * Date: 15/10/2020
- * Authors: B4412
- */
-
 package stream;
 
 import java.io.*;
 import java.net.*;
 import java.util.ArrayList;
 
+/**
+ * 
+ * La classe ThreadEcouteGroupe permet d'ecouter les messages envoyes par 
+ * les membres du groupe en meme temps que que la classe Client ecoute une entree sur la console.
+ * 
+ * @see Client
+ * @see Thread 
+ * @author B4412, Yoyo et Tintin
+ * 
+ * @param multisocket
+ *              Transmis par la Classe Client qui permet de trouver le flux a ecouter
+ * @param messageRecu
+ *              Stocke le message recu par le groupe
+ * @param taille
+ *              Specifie la taille max possible pour un message
+ * @param buffer
+ *              Stocke les bytes recus avant de les transformer en DatagramPacket
+ * @param flagQuit
+ *              Indique que le client désire quitter le groupe
+ */
+
 public class ThreadEcouteGroupe
     extends Thread {
     
     private MulticastSocket multiSocket;
     private DatagramPacket messageRecu = null;
-    //private final Integer taille = 1024;
     private Integer taille;
     private final byte buffer[];// = new byte[taille];
-    //private Integer numeroClient;
     private boolean flagQuit = false;
 
+    /**
+     * Constructeur de la classe ThreEcouteGroupe
+     * 
+     * On crée un multisocket pour rejoindre le groupe.
+     * 
+     */
     public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress, Integer tailleMax) {//, Integer numeroClient) {
         this.multiSocket = multiSocket;
         taille = tailleMax;
@@ -40,8 +58,10 @@ public class ThreadEcouteGroupe
     }
 
     /**
-  	* receives a message from server and displays it on client's console
-  	* @param BufferedReader the input data stream 
+     * Methode run
+     * <p>
+      * Recoit un message du client et l'affiche sur la console
+      </p>
   	**/
 	public void run() {
         try{
@@ -62,6 +82,11 @@ public class ThreadEcouteGroupe
         }
     }
     
+    /**
+     * Met a jour le flagQuit (utilisé depuis la classe client)
+     * @param quit
+     *          Boolean pour indiquer la valeur du flag
+     */
     public void setFlagQuit(boolean quit) {
         flagQuit = quit;
     }

@@ -1,23 +1,35 @@
-/***
- * Client
-
- * Date: 15/10/2020
- * Authors: B4412
- */
- 
 package stream;
 
 import java.io.*;
 import java.net.*;
 
-public class Client {
+/**
+ * La classe CLient inscris un client, cree un thread d'ecoute du groupe puis envoi le texte ecrit par le client a tout le groupe. 
+ * 
+ * @see ThreadEcouteGroupe
+ * @author B4412, Yoyo et Tintin
+ */
 
-    private static int test = 0;
-  /**
-  *  main method
-  *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteClient
-  **/
+
+public class Client {
   
+/**
+ * Main method
+ * 
+ * <p>
+ * On commence par créer un multicast socket avec la bonne adresse ip et le bon port pour rejoindre le groupe.
+ * On demande aussi un pseudo pour communiquer plus facilement avec le groupe.
+ * </p>
+ * <p>
+ * Ensuite, on crée un thread ThreadEcouteGroupe qui va ecouter les messages emis par les membres du groupe.
+ * </p<p>
+ * Quand le client ceut quiiter le groupe en ecrivant le caractere "." on quitte le groupe et on ferme la socket.
+ * </p>
+ * 
+ * @param args 
+ *          On attend un tableau de taille 2 : l'adresse et le port du groupe
+ * @throws  IOException
+ */
     public static void main (String[] args) throws IOException {
         
         MulticastSocket multiSocket = null;   
@@ -57,7 +69,7 @@ public class Client {
         }
         
         //Creation thread d'ecoute du groupe 
-        ThreadEcouteGroupe groupListener = new ThreadEcouteGroupe(multiSocket, groupAddress, taille);//, numeroClient);
+        ThreadEcouteGroupe groupListener = new ThreadEcouteGroupe(multiSocket, groupAddress, taille);
         
         line = " " + pseudo + " vient de rejoindre le chat.";
         message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
@@ -80,7 +92,6 @@ public class Client {
                 break;
             }
             line = pseudo + " : " + line;
-            //System.out.println("Le message a une taille de : "+line.length());
             if(line.length() <= taille){
                 message = new DatagramPacket(line.getBytes(), line.length(), groupAddress, groupPort);
                 multiSocket.send(message);

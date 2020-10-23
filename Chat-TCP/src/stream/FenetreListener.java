@@ -1,8 +1,10 @@
 /***
  * FenetreListener
- * Listener for ClientIHM 
+ * Listener for ClientIHM
  * Date: 13/10/2020
- * Authors: B4412
+ * @author B4412, Yoyo et Tintin
+ * @see WindowListener
+ * @param fenetre
  */
  
 package stream;

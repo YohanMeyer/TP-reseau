@@ -1,8 +1,8 @@
 /***
- * EchoServer
- * Example of a TCP server
+ * EchoServerMultiThreaded
+ * Recoit une demande de connexion de la part d'un client et crée pour chaque client in thread qui ecoute les messages envoyés.
  * Date: 13/10/2020
- * Authors: B4412
+ * @author B4412, Yoyo et Tintin
  */
 
 package stream;

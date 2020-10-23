@@ -1,8 +1,15 @@
 /***
  * EchoClient
- * Example of a TCP client 
+ * Etabli la connexion entre le client et le serveur et crée un thread pour ecouter les messages du serveur.
  * Date: 13/10/2020
- * Authors: B4412
+ * 
+ * @author B4412, Yoyo et Tintin
+ * @see ThreadEcouteServeur
+ * 
+ * @param fenetreParams
+ * @param jtfAdresse
+ * @param jtfPort
+ * @param jtfPseudo
  */
  
 package stream;
@@ -25,6 +32,10 @@ public class EchoClient {
     private JTextField jtfPort;
     private JTextField jtfPseudo;
     
+    /**
+     * Constructeur de EchoClient. 
+     * Initialise l'IHM
+     */
     public EchoClient () {
         
         Dimension screenDimension = Toolkit.getDefaultToolkit().getScreenSize();
@@ -81,6 +92,9 @@ public class EchoClient {
         
     }
     
+    /**
+     * recupère les données pour l'ihm
+     */
     public void recupererDonnees() {
         String addresse = jtfAddresse.getText();
         String port = jtfPort.getText();
@@ -89,6 +103,9 @@ public class EchoClient {
         fenetreParams.dispose();
     }
     
+    /**
+     * Etabli la connexion client-serveur. Crée un thread pour ecouter  le serveur
+     */
     public void init(String addresse, Integer port, String pseudo) {
         Socket echoSocket = null;
         BufferedReader socIn = null;

@@ -1,8 +1,17 @@
 /***
- * EchoClient
- * Example of a TCP client 
+ * ThreadEcouteServer 
+ * Thread côté Client qui ecoute les messages du serveur
  * Date: 13/10/2020
- * Authors: B4412
+ * 
+ * @author B4412, Yoyo et Tintin
+ * @see Thread
+ * 
+ * @param socIn
+ *          flux d'entrée sur lequel on lit les messages
+ * @param fenetre
+ *          fenetre de l''ihm
+ * 
+ * 
  */
 
 package stream;
@@ -15,15 +24,19 @@ public class ThreadEcouteServer
     private BufferedReader socIn;
     private ClientIHM fenetre;
 
+    /**
+     * Constructeur de ThreadEcouteServer
+     * @param in
+     * @param fenetre
+     */
     public ThreadEcouteServer (BufferedReader in, ClientIHM fenetre) {
         this.socIn = in;
         this.fenetre = fenetre;
     }
 
     /**
-  	* receives a message from server and displays it on client's console
-  	* @param BufferedReader the input data stream 
-  	**/
+     * Lit le flux d'entrée et l'affiche dans la fenetre
+     */
 	public void run() {
         try{
             while (true) {

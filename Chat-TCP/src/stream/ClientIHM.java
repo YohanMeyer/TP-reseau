@@ -1,8 +1,36 @@
 /***
  * ClientIHM
  * IHM for TCP Chat system
+ * Organise les elements dans une fenetre
+ * 
  * Date: 13/10/2020
- * Authors: B4412
+ * @author B4412, Yoyo et Tintin
+ * @see JFrame
+ * @param container
+ *          Container principal
+ * @param top
+ *          Container du haut
+ * @param mid
+ *          Container du milieu
+ * @param bot
+ *          Container du bas
+ * @param saisieMessage
+ *          Aire de texte pour ecrire le message
+ * @param affichageArea
+ *          Aire de texte pour afficher les messages
+ * @param afficageChat
+ *          Pour affiche le chat
+ * @param boutonEnvoie
+ *          pour envoyer un message
+ * @param boutonHistorique
+ *          pour mettre a jour l'historique
+ * @param socOut      
+ * @param echoSocket
+ *          pour communiquer avec le serveur
+ * @param pseudo
+ * @param screenDimension
+ * @param jFrameWidth
+ * @param jFrameHeight
  */
  
 package stream;
@@ -38,7 +66,11 @@ public class ClientIHM extends JFrame {
     private double jFrameHeight = screenDimension.height/800.0; // permettent d'adapter la taille de tous les composants à l'écran
 
     //pour gérer la fermeture de la fenetre et du client
-
+    /**
+     * Constructeur de Client IHM
+     * 
+     * Initialise la fenetre.
+     */
     public ClientIHM(Socket sock, String pseudo) {
         this.setTitle("Chat TCP");
         this.setSize((int)(jFrameWidth*1440), (int)(jFrameHeight*820));
@@ -94,6 +126,9 @@ public class ClientIHM extends JFrame {
         this.setVisible(true);
     }
     
+    /**
+     * Methode qui envoie le message au serveur
+     */
     public void envoyerMessage () {
         String message = saisieMessage.getText();
         if (!message.equals("$$delete$$")) {
@@ -102,14 +137,23 @@ public class ClientIHM extends JFrame {
         saisieMessage.setText("");
     }
     
+    /**
+     * Met à jour les messages recus dans le pannel affichageArea
+     */
     public void messageRecu (String line) {
         affichageArea.append(line+"\n");
     }
     
+    /**
+     * Supprime l'historique du serveur
+     */
     public void supprimerHistorique () {
         socOut.println("$$delete$$");
     }
     
+    /**
+     * Se deconnecte du serveur et ferme la socket
+     */
     public void quitter () {        
         socOut.println(".");
         try {

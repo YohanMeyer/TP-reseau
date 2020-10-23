@@ -1,8 +1,27 @@
 /***
- * EchoClient
- * Example of a TCP client 
+ * Client Thread
+ * La classe ecoute un client depuis le cote serveur.
+ * La classe ecoute les messages envoyes par les clients et les stocke. Ensuite les messages recus sont 
+ * transférs à tous les autres clients.
+ * Un thread est crée pour chaque client.
  * Date: 13/10/2020
- * Authors: B4412
+ * @author B4412, Yoyo et Tintin
+ * @see Thread
+ * 
+ * @param clientSocket
+ * 				la socket pour communiquer avec le client associé
+ * @param canSendMessage
+ *				flag pour eviter que plusieurs messages soient envoyés en même temsp
+ * @param usersOutput
+ * 				liste de tous les users stockées en static pour envoyer le message arrivant à tous les clients
+ * @param numClient
+ * 				identifie un client
+ * @param pseudoClient
+ * @param chatHistory
+ * 				permet de récupérer tout l'historique
+ * @param out
+ * 				permet d'écrire l'historique sur un fichier .txt
+ * 
  */
 
 package stream;
@@ -25,6 +44,11 @@ public class ClientThread
 	private static ArrayList<String> chatHistory = new ArrayList<String>();
 	private PrintWriter out = null;
 	
+	/**
+	 * Constructeur de la classe ClientThread.
+	 * @param socket
+	 * 			représnete a socket qui permet de communiquer avec le client associé à ce thread.
+	 */
 	public ClientThread (Socket socket) {
 		this.clientSocket = socket;
 		this.numClient = usersOutput.size();
@@ -57,8 +81,7 @@ public class ClientThread
 	}
 
  	/**
-  	* receives a message from client and sends an echo to the client
-  	* @param socket the client socket
+  	* recoit un message du client et transfère à tous les client. Appelle un méthode pour sauvegarder l'historique.
   	**/
 	
 	public void run () {
@@ -90,6 +113,12 @@ public class ClientThread
 		}
 	}
 	
+	/**
+	 * Envoie le nouveau message recu par le thread à tous les autres clients. 
+	 * Envoie de manière synchronisée tel que deux messages ne puissent pas être envoyés en même temps.
+	 * @param mssage
+	 * 			le message à envoyer à tout le monde
+	 */
 	private synchronized void sendNewMessage (String message) {		
 		while (!canSendMessage){ // un autre utilisateur est en train d'envoyer un message
 			System.out.print("");
@@ -107,6 +136,11 @@ public class ClientThread
 		canSendMessage = true;
 	}
 	
+	/**
+	 * Enregistre les nouveaux messages dans un fichier .txt
+	 * @param line
+	 * 			le message a enregistrer
+	 */
 	private void updateChatHistory (String line) {
 		try {
 			out = new PrintWriter(new BufferedWriter(new FileWriter("chat-history.txt", true)));
@@ -118,6 +152,9 @@ public class ClientThread
 		out.close();
 	}
 
+	/**
+	 * Supprime le fichier .txt pour remettre à jour l'historique
+	 */
 	private void deleteChatHistory () {
 		File file = new File("chat-history.txt");
 
