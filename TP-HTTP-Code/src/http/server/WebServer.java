@@ -79,7 +79,10 @@ public class WebServer {
                     
                     List<String> splitLine = Arrays.asList(request.split(" "));
                     
-                    if ((method.equals("GET") || method.equals("HEAD") || method.equals("DELETE") || method.equals("OPTIONS")) && request.equals("")) {
+                    if(fileName.equals("/A_coffee_please")){
+                        respond418(out);
+                        break;
+                    } else if ((method.equals("GET") || method.equals("HEAD") || method.equals("DELETE") || method.equals("OPTIONS")) && request.equals("")) {
                         break;
                     } else if ((method.equals("POST") || method.equals("PUT")) && splitLine.get(0).equals("Content-Length:")) {
                         contentLength = Integer.parseInt(splitLine.get(1));
@@ -140,7 +143,7 @@ public class WebServer {
                             first = false;
                             fichierExistant = false;
                             if (!method.equals("PUT")) {
-//                                respondError(out);
+                                respond404(out);
                             }
                             continue;
                         }
@@ -257,12 +260,12 @@ public class WebServer {
                 out.flush();
             } else {
                 System.out.println("Opération de suppression echouée");
-                respondError(out);
+                respond500(out);
             }
         } catch(Exception e) {
             System.err.println("An error occurred while deleting the file.");
             e.printStackTrace();
-            respondError(out);
+            respond500(out);
         }
     }
 
@@ -282,7 +285,7 @@ public class WebServer {
             } catch(Exception e) {
                 System.err.println("An error occurred while deleting the file.");
                 e.printStackTrace();
-                respondError(out);
+                respond500(out);
                 return;
             }
         }
@@ -296,7 +299,7 @@ public class WebServer {
         } catch (Exception e) {
             System.err.println("An error occurred while writing the new file in PUT.");
             e.printStackTrace();
-            respondError(out);
+            respond500(out);
             return;
         }
 
@@ -320,7 +323,7 @@ public class WebServer {
         {
             System.err.println("An error occurred while responding to PUT request.");
             e.printStackTrace();
-            respondError(out);
+            respond500(out);
             return;
         }
     }
@@ -333,21 +336,63 @@ public class WebServer {
             out.flush();
 
         } catch (IOException e) {            
-            System.err.println("Error while responding to GET request: " + e);
+            System.err.println("Error while responding to OPTIONS request: " + e);
         }
     }
     
-    protected void respondError (OutputStream out) {
+    protected void respond400 (OutputStream out) {
         // Send the response
         // Send the headers
         try {
-            byte[] header = ("HTTP/1.0 400 BAD\nContent-Type:tex/plain\nServer: Bot\n\r\nBAD ERROR 400\n").getBytes("UTF-8");
+            byte[] header = ("HTTP/1.0 400 BAD\nContent-Type:text/plain\nServer: Bot\n\r\nBAD ERROR 400\n").getBytes("UTF-8");
 
             out.write(header);
             out.flush();
 
         } catch (IOException e) {            
-            System.err.println("Error while responding to HEAD request: " + e);
+            System.err.println("Error while responding a 400 error: " + e);
+        }
+    }
+
+    protected void respond404 (OutputStream out) {
+        // Send the response
+        // Send the headers
+        try {
+            byte[] header = ("HTTP/1.0 404 Not found\nContent-Type:text/plain\nServer: Bot\n\r\nNot found - ERROR 404\n").getBytes("UTF-8");
+
+            out.write(header);
+            out.flush();
+
+        } catch (IOException e) {            
+            System.err.println("Error while responding a 404 error: " + e);
+        }
+    }
+
+    protected void respond418 (OutputStream out) {
+        // Send the response
+        // Send the headers
+        try {
+            byte[] header = ("HTTP/1.0 418 I'm a teapot\nContent-Type:text/plain\nServer: Bot\n\r\nI'm a teapot - ERROR 418\n").getBytes("UTF-8");
+
+            out.write(header);
+            out.flush();
+
+        } catch (IOException e) {            
+            System.err.println("Error while responding a 418 error: " + e);
+        }
+    }
+
+    protected void respond500 (OutputStream out) {
+        // Send the response
+        // Send the headers
+        try {
+            byte[] header = ("HTTP/1.0 500 Internal Server Error\nContent-Type:text/plain\nServer: Bot\n\r\nInternal Server Error - ERROR 500\n").getBytes("UTF-8");
+
+            out.write(header);
+            out.flush();
+
+        } catch (IOException e) {            
+            System.err.println("Error while responding a 500 error: " + e);
         }
     }
 
