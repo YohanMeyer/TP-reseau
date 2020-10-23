@@ -44,11 +44,6 @@ public class WebServer {
                     remote.getInputStream()));
                 OutputStream out = remote.getOutputStream();
 
-                // read the data sent. We basically ignore it,
-                // stop reading once a blank line is hit. This
-                // blank line signals the end of the client HTTP
-                // headers.
-
                 byte[] readFile;
                 String request = ".";
                 String fileName = "";
