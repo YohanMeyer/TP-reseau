@@ -1,4 +1,8 @@
-///A Simple Web Server (WebServer.java)
+/**
+ * Web Server qui gère des reuêtes HTTP
+ * 
+ * @author B4412, Yoyo et Tintin
+ */
 
 package http.server;
 
@@ -18,8 +22,10 @@ import java.io.File;
 
 public class WebServer {
     /**
-    * WebServer constructor.
-    */
+     * Crée un serverSocket.
+     * Quand une connexion arrive, on regarde le type de requete (Head, put, get, post...) 
+     * et on appelle la méthode appropriée
+     */
     protected void start() {
         ServerSocket s;
 
@@ -169,6 +175,12 @@ public class WebServer {
         }
     }
     
+    /**
+     * Renvoie le fichier demandé
+     * @param out
+     * @param fileContent
+     * @param fileType
+     */
     protected void respondToGet (OutputStream out, byte[] fileContent, String fileType) {
         // Send the response
         // Send the headers
@@ -185,7 +197,13 @@ public class WebServer {
             System.err.println("Error while responding to GET request: " + e);
         }
     }
-    
+
+    /**
+     * Renvoie le fichier demandé
+     * @param out
+     * @param fileContent
+     * @param fileType
+     */
     protected void respondToPost (OutputStream out, byte[] fileContent, String fileType) {
         // Send the response
         // Send the headers
@@ -203,6 +221,10 @@ public class WebServer {
         }
     }
     
+    /**
+     * Renvoie une entete
+     * @param out
+     */
     protected void respondToHead (OutputStream out) {
         // Send the response
         // Send the headers
@@ -217,6 +239,11 @@ public class WebServer {
         }
     }
 
+    /**
+     * Supprime le fichier demandé
+     * @param out
+     * @param fileName
+     */
     protected void respondToDelete (OutputStream out, String fileName) {
         File file=null;
 
@@ -243,6 +270,13 @@ public class WebServer {
         }
     }
 
+    /**
+     * Crée ou met à jour le fichier en parametre
+     * @param out
+     * @param fileName
+     * @param fichierExistant
+     * @param fileName
+     */
     protected void respondToPut (OutputStream out, String fileContent, boolean fichierExistant, String fileName) {
         File file = null;
 
@@ -302,6 +336,8 @@ public class WebServer {
         }
     }
     
+    /**
+     * Renvoie ce que peut gérer le serveur */    
     protected void respondToOptions (OutputStream out, String fileType) {
         try {
             byte[] header = ("HTTP/1.0 200 OK\nAccess-Control-Allow-Headers: Content-Type, Accept, Access-Control-Allow-Origin, Authorization\nAccess-Control-Allow-Methods: OPTIONS, HEAD, DELETE, POST, GET\nAccess-Control-Allow-Origin: *\nAllow: OPTIONS, HEAD, DELETE, POST, GET\nContent-Type: " + fileType + "\nContent-Length:0\nServer: Bot\n\r\n").getBytes("UTF-8");
@@ -314,6 +350,9 @@ public class WebServer {
         }
     }
     
+    /**
+     * Envoie message d'erreur 
+     */
     protected void respond400 (OutputStream out) {
         // Send the response
         // Send the headers
@@ -328,6 +367,9 @@ public class WebServer {
         }
     }
 
+    /**
+     * Envoie message d'erreur not found
+     */
     protected void respond404 (OutputStream out) {
         // Send the response
         // Send the headers
@@ -342,6 +384,9 @@ public class WebServer {
         }
     }
 
+    /**
+     * Envoie message d'erreur I'm a teapot
+     */
     protected void respond418 (OutputStream out) {
         // Send the response
         // Send the headers
@@ -356,6 +401,9 @@ public class WebServer {
         }
     }
 
+    /**
+     * Envoie message d'erreur interne
+     */
     protected void respond500 (OutputStream out) {
         // Send the response
         // Send the headers
