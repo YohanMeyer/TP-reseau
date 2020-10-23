@@ -13,16 +13,6 @@ import java.util.ArrayList;
  * @see Thread 
  * @author B4412, Yoyo et Tintin
  * 
- * @param multisocket
- *              Transmis par la Classe Client qui permet de trouver le flux a ecouter
- * @param messageRecu
- *              Stocke le message recu par le groupe
- * @param taille
- *              Specifie la taille max possible pour un message
- * @param buffer
- *              Stocke les bytes recus avant de les transformer en DatagramPacket
- * @param flagQuit
- *              Indique que le client désire quitter le groupe
  */
 
 public class ThreadEcouteGroupe
@@ -38,9 +28,11 @@ public class ThreadEcouteGroupe
      * Constructeur de la classe ThreEcouteGroupe
      * 
      * On crée un multisocket pour rejoindre le groupe.
-     * 
+     * @param multiSocket la socket de connexion au groupe
+     * @param groupAddress l'addresse de connexion au groupe
+     * @param tailleMax limite de taille de message
      */
-    public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress, Integer tailleMax) {//, Integer numeroClient) {
+    public ThreadEcouteGroupe (MulticastSocket multiSocket, InetAddress groupAddress, Integer tailleMax) {
         this.multiSocket = multiSocket;
         taille = tailleMax;
         buffer = new byte[taille];
@@ -60,7 +52,7 @@ public class ThreadEcouteGroupe
     /**
      * Methode run
      * <p>
-      * Recoit un message du client et l'affiche sur la console
+     * Recoit un message du client et l'affiche sur la console
       </p>
   	**/
 	public void run() {

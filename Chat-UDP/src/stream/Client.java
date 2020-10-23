@@ -9,14 +9,13 @@ import java.net.*;
  * @see ThreadEcouteGroupe
  * @author B4412, Yoyo et Tintin
  */
-
-    private static int test = 0;
-  /**
-  *  main method
-  *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteClient
-  * @param args ip address of group host and group port
-  **/
   
+public class Client {
+    /**
+    *  main method
+    *  accepts a connection, waits for keyboard input and creates an instance of ThreadEcouteClient
+    * @param args ip address of group host and group port
+    **/
     public static void main (String[] args) {
         
         MulticastSocket multiSocket = null;   
