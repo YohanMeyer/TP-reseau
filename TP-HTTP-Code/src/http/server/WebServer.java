@@ -4,17 +4,18 @@ package http.server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.io.OutputStream;
-import java.io.FileOutputStream;
-import java.io.File;
+import java.io.*;
 
 public class WebServer {
     /**
@@ -29,7 +30,7 @@ public class WebServer {
             // create the main server socket
             s = new ServerSocket(80);
         } catch (Exception e) {
-            System.err.println("Error: " + e);
+            System.err.println("Error while creating server socket: " + e);
             return;
         }
 
@@ -45,7 +46,7 @@ public class WebServer {
                 OutputStream out = remote.getOutputStream();
 
                 byte[] readFile;
-                String request = ".";
+                String request = in.readLine();
                 String fileName = "";
                 boolean first = true;
                 boolean fichierExistant = true;
@@ -56,7 +57,6 @@ public class WebServer {
                 
                 while (request != null) // reading a request
                 {            
-                    request = in.readLine();
                     
                     List<String> splitLine = Arrays.asList(request.split(" "));
                     
@@ -73,19 +73,16 @@ public class WebServer {
                         char[] body = new char[contentLength];
                         in.read(body, 0, contentLength);
                         request = new String(body);
-                           
                         
                         if (method.equals("PUT")) { 
                             respondToPut(out, request, fichierExistant, fileName);
                         } else if(method.equals("POST")) {
                             System.out.println(request);
                         }
-                             
                         break;
                     }
                     
                     if (first) {
-                        
                         fileName = splitLine.get(1);
                         method = splitLine.get(0);
                         if (fileName.equals("/")) {
@@ -93,6 +90,7 @@ public class WebServer {
                         }
                         
                         try {
+                            //readFile = new ArrayList<String>(Files.readAllLines(Paths.get("./http/server"+fileName), Charset.defaultCharset()));
                             readFile = Files.readAllBytes(Paths.get("./http/server"+fileName));
                             
                             if (fileName.contains(".css")) {
@@ -114,6 +112,7 @@ public class WebServer {
                             } else if(fileName.contains(".mkv")) {
                                 fileType = "video/webm";
                             }
+                            System.out.println("file reading ok"+readFile.length);
                         } catch(IOException e) {
                             first = false;
                             fichierExistant = false;
@@ -127,44 +126,39 @@ public class WebServer {
                             case "GET":
                                 System.out.println("GET");
                                 respondToGet(out, readFile, fileType);
-                                
                                 break;
 
                             case "POST":
                                 System.out.println("POST");
                                 respondToPost(out, readFile, fileType);  
-
                                 break;
 
                             case "HEAD":
                                 System.out.println("HEAD");
                                 respondToHead(out);
-                                
                                 break;
 
                             case "PUT":
                                 System.out.println("PUT");
-                                
                                 break;
 
                             case "DELETE":
                                 System.out.println("DELETE");
                                 respondToDelete(out, fileName);
-                                
                                 break;
+                                
                             case "OPTIONS":
                                 System.out.println("OPTIONS");
                                 respondToOptions(out, fileType);  
-                                
                                 break;
                         }
                     }
-                    
                     first = false;
+                    request = in.readLine();
                 }
                 remote.close();
             } catch (Exception e) {
-                System.err.println("Error: " + e);
+                System.err.println("Error while treating request: " + e);
             }
         }
     }
@@ -254,7 +248,7 @@ public class WebServer {
                 if (file.delete()) {
                     System.out.println(file.getName() + " est supprimé.");
                 } else {
-                    System.err.println("Opération de suppression echouée");
+                    System.out.println("Opération de suppression echouée");
                 }
             } catch(Exception e) {
                 System.err.println("An error occurred while deleting the file.");
@@ -293,8 +287,7 @@ public class WebServer {
                 out.write(header);
                 out.flush();
             } 
-        } catch(IOException e)
-        {
+        } catch(IOException e) {
             System.err.println("An error occurred while responding to PUT request.");
             e.printStackTrace();
             respond500(out);
