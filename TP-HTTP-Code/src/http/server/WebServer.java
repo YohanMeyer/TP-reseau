@@ -79,7 +79,10 @@ public class WebServer {
                     
                     List<String> splitLine = Arrays.asList(request.split(" "));
                     
-                    if ((method.equals("GET") || method.equals("HEAD")) && request.equals("")) {
+                    if(fileName.equals("/A coffee please")){
+                        respond418(out);
+                        break;
+                    } else if ((method.equals("GET") || method.equals("HEAD")) && request.equals("")) {
                         break;
                     } else if ((method.equals("POST") || method.equals("PUT")) && splitLine.get(0).equals("Content-Length:")) {
                         contentLength = Integer.parseInt(splitLine.get(1));
