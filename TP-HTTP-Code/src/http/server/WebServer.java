@@ -4,18 +4,17 @@ package http.server;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
 import java.nio.file.Files;
 import java.nio.charset.Charset;
 import java.io.IOException;
 import java.nio.file.Paths;
-import java.io.*;
+import java.io.OutputStream;
+import java.io.FileOutputStream;
+import java.io.File;
 
 public class WebServer {
     /**
@@ -99,7 +98,6 @@ public class WebServer {
                         }
                         
                         try {
-                            //readFile = new ArrayList<String>(Files.readAllLines(Paths.get("./http/server"+fileName), Charset.defaultCharset()));
                             readFile = Files.readAllBytes(Paths.get("./http/server"+fileName));
                             
                             if (fileName.contains(".css")) {
