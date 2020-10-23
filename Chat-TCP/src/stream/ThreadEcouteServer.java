@@ -6,10 +6,8 @@
  * @author B4412, Yoyo et Tintin
  * @see Thread
  * 
- * @param socIn
- *          flux d'entrée sur lequel on lit les messages
- * @param fenetre
- *          fenetre de l''ihm
+ * @param socIn flux d'entrée sur lequel on lit les messages
+ * @param fenetre fenetre de l''ihm
  * 
  * 
  */
@@ -26,8 +24,8 @@ public class ThreadEcouteServer
 
     /**
      * Constructeur de ThreadEcouteServer
-     * @param in
-     * @param fenetre
+     * @param in flux d'entrée
+     * @param fenetre fenetre principale
      */
     public ThreadEcouteServer (BufferedReader in, ClientIHM fenetre) {
         this.socIn = in;

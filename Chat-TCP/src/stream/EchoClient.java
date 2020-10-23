@@ -105,6 +105,9 @@ public class EchoClient {
     
     /**
      * Etabli la connexion client-serveur. Crée un thread pour ecouter  le serveur
+     * @param addresse l'addresse de connexion au serveur
+     * @param port le port de connexion
+     * @param pseudo le pseudo de l'utilisateur
      */
     public void init(String addresse, Integer port, String pseudo) {
         Socket echoSocket = null;

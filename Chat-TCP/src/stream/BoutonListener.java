@@ -31,8 +31,8 @@ public class BoutonListener implements ActionListener {
     
     /**
      * Constructeur de la classe BoutonListener a partir des attributs fen et numBouton
-     * @param fen
-     * @param numBouton
+     * @param fen fenetre principale
+     * @param numBouton indicateur de bouton
      */
     public BoutonListener(ClientIHM fen, int numBouton) {
         fenetre = fen;
@@ -40,7 +40,7 @@ public class BoutonListener implements ActionListener {
     }
     /**
      * Constructeur de la classe BoutonListener a partir d'un attribut EchClient
-     * @param par
+     * @param par fenetre de parametres
      */
     public BoutonListener(EchoClient par) {
         params = par;
@@ -48,7 +48,7 @@ public class BoutonListener implements ActionListener {
     }
     /**
      * Execute l'action en fonction du bouton d'ecoute
-     * @param e
+     * @param e action faire par l'utilisateur
      */
     public void actionPerformed(ActionEvent e)
     {

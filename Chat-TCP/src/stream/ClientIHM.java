@@ -27,10 +27,10 @@
  * @param socOut      
  * @param echoSocket
  *          pour communiquer avec le serveur
- * @param pseudo
- * @param screenDimension
- * @param jFrameWidth
- * @param jFrameHeight
+ * @param pseudo pseudo de l'utilisateur
+ * @param screenDimension dimensions de l'écran
+ * @param jFrameWidth largeur de l'écran
+ * @param jFrameHeight hauteur de l'écran
  */
  
 package stream;
@@ -70,6 +70,8 @@ public class ClientIHM extends JFrame {
      * Constructeur de Client IHM
      * 
      * Initialise la fenetre.
+     * @param sock la socket de connexion au serveur
+     * @param pseudo le pseudo de l'utilisateur
      */
     public ClientIHM(Socket sock, String pseudo) {
         this.setTitle("Chat TCP");
@@ -139,6 +141,7 @@ public class ClientIHM extends JFrame {
     
     /**
      * Met à jour les messages recus dans le pannel affichageArea
+     * @param line message reçu du serveur
      */
     public void messageRecu (String line) {
         affichageArea.append(line+"\n");
